@@ -34,8 +34,401 @@ const AppState = {
     animations: [],
     speechSynthesis: null,
     speechRecognition: null,
-    currentDemo: null
+    currentDemo: null,
+    quizResults: {}
 };
+
+// Quiz Implementation
+const quizQuestions = [
+    {
+        question: "How do you prefer to absorb new information?",
+        options: [
+            { text: "Visual diagrams and infographics", type: "visual" },
+            { text: "Listening to explanations or discussions", type: "auditory" },
+            { text: "Hands-on practice and experimentation", type: "kinesthetic" },
+            { text: "Reading detailed written explanations", type: "reading" }
+        ]
+    },
+    {
+        question: "What helps you maintain focus during learning?",
+        options: [
+            { text: "Frequent breaks and movement", type: "adhd" },
+            { text: "Clear structure and predictable routines", type: "autism" },
+            { text: "Minimal distractions and quiet environment", type: "sensory" },
+            { text: "Interactive and engaging content", type: "engagement" }
+        ]
+    },
+    {
+        question: "How do you prefer to demonstrate understanding?",
+        options: [
+            { text: "Multiple choice or structured formats", type: "structured" },
+            { text: "Creative projects and presentations", type: "creative" },
+            { text: "Verbal explanations or discussions", type: "verbal" },
+            { text: "Written reports or essays", type: "written" }
+        ]
+    },
+    {
+        question: "What's your ideal learning pace?",
+        options: [
+            { text: "Self-paced with flexibility to revisit", type: "flexible" },
+            { text: "Structured timeline with clear milestones", type: "structured" },
+            { text: "Intensive bursts with breaks between", type: "intensive" },
+            { text: "Steady, consistent daily progress", type: "consistent" }
+        ]
+    },
+    {
+        question: "Which environment helps you learn best?",
+        options: [
+            { text: "Quiet, organized space with minimal stimulation", type: "calm" },
+            { text: "Collaborative spaces with peer interaction", type: "social" },
+            { text: "Flexible spaces where I can move around", type: "mobile" },
+            { text: "Technology-rich environment with digital tools", type: "digital" }
+        ]
+    },
+    {
+        question: "How do you process complex information?",
+        options: [
+            { text: "Break it into smaller, manageable chunks", type: "chunked" },
+            { text: "See the big picture first, then details", type: "holistic" },
+            { text: "Work through step-by-step sequences", type: "sequential" },
+            { text: "Connect it to existing knowledge", type: "connected" }
+        ]
+    },
+    {
+        question: "What motivates you most in learning?",
+        options: [
+            { text: "Clear progress tracking and achievements", type: "progress" },
+            { text: "Real-world applications and relevance", type: "practical" },
+            { text: "Personal interest and curiosity", type: "intrinsic" },
+            { text: "Support and encouragement from others", type: "social_support" }
+        ]
+    },
+    {
+        question: "How do you handle new challenges?",
+        options: [
+            { text: "Take time to plan and prepare thoroughly", type: "methodical" },
+            { text: "Jump in and learn by doing", type: "experimental" },
+            { text: "Seek guidance and support from mentors", type: "guided" },
+            { text: "Research extensively before starting", type: "research" }
+        ]
+    }
+];
+
+const quizRecommendations = {
+    visual: {
+        title: "Visual Learner",
+        description: "You learn best through diagrams, charts, and visual representations.",
+        recommendations: ["Mind mapping tools", "Infographic summaries", "Video content", "Color-coded materials"]
+    },
+    auditory: {
+        title: "Auditory Learner",
+        description: "You process information effectively through listening and discussion.",
+        recommendations: ["Audio lectures", "Discussion groups", "Voice recordings", "Music-based learning"]
+    },
+    kinesthetic: {
+        title: "Kinesthetic Learner",
+        description: "You learn through hands-on experience and physical activity.",
+        recommendations: ["Interactive simulations", "Physical models", "Movement breaks", "Practical exercises"]
+    },
+    reading: {
+        title: "Reading/Writing Learner",
+        description: "You prefer text-based learning and written communication.",
+        recommendations: ["Detailed notes", "Written summaries", "Text-based resources", "Journaling exercises"]
+    },
+    adhd: {
+        title: "ADHD-Friendly Approach",
+        description: "You benefit from movement, breaks, and engaging content.",
+        recommendations: ["Pomodoro technique", "Fidget tools", "Gamified learning", "Regular movement breaks"]
+    },
+    autism: {
+        title: "Autism-Friendly Approach",
+        description: "You thrive with structure, predictability, and clear expectations.",
+        recommendations: ["Detailed schedules", "Visual timetables", "Sensory accommodations", "Clear instructions"]
+    },
+    sensory: {
+        title: "Sensory-Sensitive Approach",
+        description: "You need controlled environments with minimal sensory overload.",
+        recommendations: ["Noise-cancelling headphones", "Adjustable lighting", "Calm spaces", "Sensory breaks"]
+    }
+};
+
+class QuizManager {
+    constructor() {
+        this.currentQuestion = 0;
+        this.answers = [];
+        this.results = {};
+        this.isActive = false;
+    }
+
+    init() {
+        this.createQuizUI();
+        this.bindEvents();
+    }
+
+    createQuizUI() {
+        const quizHTML = `
+            <div id="quiz-container" class="quiz-container" aria-hidden="true">
+                <div class="quiz-content">
+                    <div class="quiz-header">
+                        <h2>Learning Style Assessment</h2>
+                        <p>Discover your personalised learning preferences</p>
+                        <div class="quiz-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="quiz-progress"></div>
+                            </div>
+                            <span class="progress-text" id="progress-text">Question 1 of ${quizQuestions.length}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="quiz-body" id="quiz-body">
+                        <div class="question-container" id="question-container">
+                            <!-- Questions will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="quiz-controls">
+                        <button id="quiz-prev" class="btn-secondary" disabled>Previous</button>
+                        <button id="quiz-next" class="btn-primary" disabled>Next</button>
+                        <button id="quiz-submit" class="btn-primary" style="display: none;">View Results</button>
+                    </div>
+                    
+                    <button id="quiz-close" class="quiz-close" aria-label="Close quiz">×</button>
+                </div>
+            </div>
+            
+            <div id="quiz-results" class="quiz-results" aria-hidden="true">
+                <div class="results-content">
+                    <div class="results-header">
+                        <h2>Your Learning Profile</h2>
+                        <p>Based on your responses, here are your personalised recommendations</p>
+                    </div>
+                    
+                    <div class="results-body" id="results-body">
+                        <!-- Results will be populated here -->
+                    </div>
+                    
+                    <div class="results-actions">
+                        <button id="retake-quiz" class="btn-secondary">Retake Assessment</button>
+                        <button id="save-results" class="btn-primary">Save My Profile</button>
+                        <button id="close-results" class="btn-secondary">Close</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', quizHTML);
+    }
+
+    bindEvents() {
+        $('#learn-more')?.addEventListener('click', () => this.startQuiz());
+        $('#quiz-close')?.addEventListener('click', () => this.closeQuiz());
+        $('#quiz-prev')?.addEventListener('click', () => this.previousQuestion());
+        $('#quiz-next')?.addEventListener('click', () => this.nextQuestion());
+        $('#quiz-submit')?.addEventListener('click', () => this.showResults());
+        $('#retake-quiz')?.addEventListener('click', () => this.restartQuiz());
+        $('#save-results')?.addEventListener('click', () => this.saveResults());
+        $('#close-results')?.addEventListener('click', () => this.closeResults());
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (this.isActive) {
+                if (e.key === 'Escape') {
+                    this.closeQuiz();
+                } else if (e.key === 'ArrowLeft' && !$('#quiz-prev').disabled) {
+                    this.previousQuestion();
+                } else if (e.key === 'ArrowRight' && !$('#quiz-next').disabled) {
+                    this.nextQuestion();
+                }
+            }
+        });
+    }
+
+    startQuiz() {
+        this.isActive = true;
+        this.currentQuestion = 0;
+        this.answers = [];
+        $('#quiz-container').style.display = 'flex';
+        $('#quiz-container').setAttribute('aria-hidden', 'false');
+        this.displayQuestion();
+        
+        // Accessibility announcement
+        this.announceToScreenReader('Learning style assessment started. Navigate through questions using the Previous and Next buttons or arrow keys.');
+    }
+
+    displayQuestion() {
+        const question = quizQuestions[this.currentQuestion];
+        const container = $('#question-container');
+        
+        container.innerHTML = `
+            <div class="question">
+                <h3>${question.question}</h3>
+                <div class="options" role="radiogroup" aria-labelledby="question-${this.currentQuestion}">
+                    ${question.options.map((option, index) => `
+                        <label class="option-label">
+                            <input type="radio" 
+                                   name="question-${this.currentQuestion}" 
+                                   value="${option.type}" 
+                                   id="option-${this.currentQuestion}-${index}"
+                                   aria-describedby="question-${this.currentQuestion}">
+                            <span class="option-text">${option.text}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        // Update progress
+        const progress = ((this.currentQuestion + 1) / quizQuestions.length) * 100;
+        $('#quiz-progress').style.width = progress + '%';
+        $('#progress-text').textContent = `Question ${this.currentQuestion + 1} of ${quizQuestions.length}`;
+
+        // Update controls
+        $('#quiz-prev').disabled = this.currentQuestion === 0;
+        $('#quiz-next').style.display = this.currentQuestion === quizQuestions.length - 1 ? 'none' : 'inline-block';
+        $('#quiz-submit').style.display = this.currentQuestion === quizQuestions.length - 1 ? 'inline-block' : 'none';
+
+        // Restore previous answer if exists
+        if (this.answers[this.currentQuestion]) {
+            const input = container.querySelector(`input[value="${this.answers[this.currentQuestion]}"]`);
+            if (input) input.checked = true;
+            this.updateNextButton();
+        } else {
+            $('#quiz-next').disabled = true;
+            $('#quiz-submit').disabled = true;
+        }
+
+        // Bind option change events
+        container.querySelectorAll('input[type="radio"]').forEach(input => {
+            input.addEventListener('change', () => {
+                this.answers[this.currentQuestion] = input.value;
+                this.updateNextButton();
+            });
+        });
+    }
+
+    updateNextButton() {
+        const hasAnswer = this.answers[this.currentQuestion] !== undefined;
+        $('#quiz-next').disabled = !hasAnswer;
+        $('#quiz-submit').disabled = !hasAnswer;
+    }
+
+    previousQuestion() {
+        if (this.currentQuestion > 0) {
+            this.currentQuestion--;
+            this.displayQuestion();
+        }
+    }
+
+    nextQuestion() {
+        if (this.currentQuestion < quizQuestions.length - 1) {
+            this.currentQuestion++;
+            this.displayQuestion();
+        }
+    }
+
+    calculateResults() {
+        const typeCounts = {};
+        
+        this.answers.forEach(answer => {
+            typeCounts[answer] = (typeCounts[answer] || 0) + 1;
+        });
+
+        // Find dominant types
+        const sortedTypes = Object.entries(typeCounts)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 3);
+
+        return sortedTypes.map(([type, count]) => ({
+            type,
+            count,
+            percentage: (count / this.answers.length) * 100,
+            ...quizRecommendations[type]
+        }));
+    }
+
+    showResults() {
+        this.results = this.calculateResults();
+        AppState.quizResults = this.results;
+        
+        $('#quiz-container').style.display = 'none';
+        $('#quiz-container').setAttribute('aria-hidden', 'true');
+        
+        const resultsBody = $('#results-body');
+        resultsBody.innerHTML = this.results.map(result => `
+            <div class="result-card">
+                <div class="result-header">
+                    <h3>${result.title}</h3>
+                    <div class="result-percentage">${Math.round(result.percentage)}%</div>
+                </div>
+                <p class="result-description">${result.description}</p>
+                <div class="recommendations">
+                    <h4>Recommendations for you:</h4>
+                    <ul>
+                        ${result.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+        `).join('');
+
+        $('#quiz-results').style.display = 'flex';
+        $('#quiz-results').setAttribute('aria-hidden', 'false');
+        
+        this.announceToScreenReader('Quiz completed. Your personalised learning profile is ready.');
+    }
+
+    saveResults() {
+        try {
+            localStorage.setItem('allieDigitalQuizResults', JSON.stringify(this.results));
+            localStorage.setItem('allieDigitalQuizDate', new Date().toISOString());
+            this.announceToScreenReader('Your learning profile has been saved successfully.');
+            
+            // Visual feedback
+            const saveButton = $('#save-results');
+            const originalText = saveButton.textContent;
+            saveButton.textContent = 'Saved!';
+            saveButton.disabled = true;
+            
+            setTimeout(() => {
+                saveButton.textContent = originalText;
+                saveButton.disabled = false;
+            }, 2000);
+        } catch (error) {
+            console.error('Failed to save quiz results:', error);
+            this.announceToScreenReader('Failed to save results. Please try again.');
+        }
+    }
+
+    restartQuiz() {
+        this.closeResults();
+        this.startQuiz();
+    }
+
+    closeQuiz() {
+        this.isActive = false;
+        $('#quiz-container').style.display = 'none';
+        $('#quiz-container').setAttribute('aria-hidden', 'true');
+    }
+
+    closeResults() {
+        $('#quiz-results').style.display = 'none';
+        $('#quiz-results').setAttribute('aria-hidden', 'true');
+    }
+
+    announceToScreenReader(message) {
+        // Create a temporary element for screen reader announcements
+        const announcement = document.createElement('div');
+        announcement.setAttribute('aria-live', 'polite');
+        announcement.setAttribute('aria-atomic', 'true');
+        announcement.className = 'sr-only';
+        announcement.textContent = message;
+        
+        document.body.appendChild(announcement);
+        
+        setTimeout(() => {
+            document.body.removeChild(announcement);
+        }, 1000);
+    }
+}
 
 // ===== UTILITY FUNCTIONS =====
 function $(selector) {
@@ -1033,6 +1426,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the application
     const app = new AllieDigitalApp();
     
+    // Initialize quiz manager
+    const quizManager = new QuizManager();
+    quizManager.init();
+    
     // Global error handling
     window.addEventListener('error', (e) => {
         console.error('Application error:', e.error);
@@ -1049,5 +1446,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    console.log('Allie Digital platform initialized successfully!');
+    console.log('Allie Digital platform with quiz functionality initialized successfully!');
 });
