@@ -931,7 +931,7 @@ class AllieDigitalApp {
     
     startLearningJourney() {
         // Simulate starting the learning journey
-        this.accessibility.speak('Welcome to your personalized learning journey! Let me guide you through our features.');
+        this.accessibility.speak('Welcome to your personalised learning journey! Let me guide you through our features.');
         
         // Scroll to features section
         setTimeout(() => {
@@ -1049,5 +1049,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    console.log('AllieDigital platform initialized successfully!');
+    console.log('Allie Digital platform initialized successfully!');
 });
