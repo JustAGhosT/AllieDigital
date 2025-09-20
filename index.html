@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AllieDigital - Personalized Learning for Neurodivergent Minds</title>
+    <meta name="description" content="A personalized learning platform designed for neurodivergent learners with ADHD, autism, dyslexia, and other learning differences.">
+    
+    <!-- Accessibility and SEO -->
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="AllieDigital">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="preload" href="script.js" as="script">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Font for better readability (dyslexia-friendly) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Skip to main content for screen readers -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Accessibility Settings Panel -->
+    <div id="accessibility-panel" class="accessibility-panel" role="dialog" aria-labelledby="accessibility-title" aria-hidden="true">
+        <div class="accessibility-content">
+            <h2 id="accessibility-title">Accessibility Settings</h2>
+            <div class="setting-group">
+                <label for="font-size-slider">Font Size</label>
+                <input type="range" id="font-size-slider" min="12" max="24" value="16" aria-label="Adjust font size">
+                <span id="font-size-value">16px</span>
+            </div>
+            <div class="setting-group">
+                <label for="contrast-toggle">High Contrast</label>
+                <input type="checkbox" id="contrast-toggle" aria-label="Toggle high contrast mode">
+            </div>
+            <div class="setting-group">
+                <label for="motion-toggle">Reduce Motion</label>
+                <input type="checkbox" id="motion-toggle" aria-label="Reduce animations and motion">
+            </div>
+            <div class="setting-group">
+                <label for="reading-guide-toggle">Reading Guide</label>
+                <input type="checkbox" id="reading-guide-toggle" aria-label="Enable reading guide for dyslexia support">
+            </div>
+            <button id="close-accessibility" class="btn-secondary">Close</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header" role="banner">
+        <nav class="nav" role="navigation" aria-label="Main navigation">
+            <div class="nav-brand">
+                <h1>AllieDigital</h1>
+                <span class="tagline">Learning Without Limits</span>
+            </div>
+            <div class="nav-controls">
+                <button id="accessibility-btn" class="btn-icon" aria-label="Open accessibility settings">
+                    <span class="icon">⚙️</span>
+                </button>
+                <button id="speech-toggle" class="btn-icon" aria-label="Toggle speech support">
+                    <span class="icon">🔊</span>
+                </button>
+                <button id="theme-toggle" class="btn-icon" aria-label="Toggle dark mode">
+                    <span class="icon">🌙</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content" role="main">
+        <!-- Hero Section with Neural Network -->
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="hero-content">
+                <h2 id="hero-title">Discover Your Unique Learning Style</h2>
+                <p class="hero-description">
+                    Experience personalized education designed specifically for neurodivergent minds.
+                    Our adaptive platform celebrates diverse thinking patterns and learning differences.
+                </p>
+                <div class="hero-actions">
+                    <button class="btn-primary" id="start-journey">Start Your Journey</button>
+                    <button class="btn-secondary" id="learn-more">Learn More</button>
+                </div>
+            </div>
+            
+            <!-- Interactive Neural Network Canvas -->
+            <div class="neural-container" role="img" aria-label="Interactive neural network visualization">
+                <canvas id="neural-canvas" width="800" height="600"></canvas>
+                <div class="canvas-overlay">
+                    <p class="canvas-description">Interactive neural network that responds to your movements</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features" aria-labelledby="features-title">
+            <h2 id="features-title">Designed for Neurodivergent Learners</h2>
+            <div class="feature-grid">
+                <article class="feature-card" tabindex="0">
+                    <div class="feature-icon">🧩</div>
+                    <h3>ADHD Support</h3>
+                    <p>Chunked content, focus timers, and distraction-free learning environments tailored for ADHD minds.</p>
+                </article>
+                <article class="feature-card" tabindex="0">
+                    <div class="feature-icon">🌈</div>
+                    <h3>Autism-Friendly</h3>
+                    <p>Predictable routines, sensory considerations, and clear visual structures for autistic learners.</p>
+                </article>
+                <article class="feature-card" tabindex="0">
+                    <div class="feature-icon">📖</div>
+                    <h3>Dyslexia Tools</h3>
+                    <p>Specialized fonts, reading guides, and text-to-speech for dyslexic students.</p>
+                </article>
+                <article class="feature-card" tabindex="0">
+                    <div class="feature-icon">🎯</div>
+                    <h3>AI Personalization</h3>
+                    <p>Adaptive learning paths that evolve with your unique cognitive patterns and preferences.</p>
+                </article>
+                <article class="feature-card" tabindex="0">
+                    <div class="feature-icon">🎤</div>
+                    <h3>Speech Support</h3>
+                    <p>Voice commands, text-to-speech, and speech recognition for hands-free learning.</p>
+                </article>
+                <article class="feature-card" tabindex="0">
+                    <div class="feature-icon">👥</div>
+                    <h3>Community</h3>
+                    <p>Connect with other neurodivergent learners in a safe, supportive environment.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- Interactive Learning Demo -->
+        <section class="demo-section" aria-labelledby="demo-title">
+            <h2 id="demo-title">Experience Adaptive Learning</h2>
+            <div class="demo-container">
+                <div class="quantum-field" role="img" aria-label="Quantum wave field visualization">
+                    <canvas id="quantum-canvas" width="600" height="400"></canvas>
+                </div>
+                <div class="demo-controls">
+                    <h3>Try Our Interactive Elements</h3>
+                    <button class="demo-btn" data-action="particles">Floating Particles</button>
+                    <button class="demo-btn" data-action="waves">Quantum Waves</button>
+                    <button class="demo-btn" data-action="neural">Neural Connections</button>
+                    <div class="demo-info">
+                        <p id="demo-feedback" aria-live="polite">Click the buttons above to see our adaptive visualizations in action!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Community Section -->
+        <section class="community" aria-labelledby="community-title">
+            <h2 id="community-title">Join Our Learning Community</h2>
+            <div class="community-grid">
+                <div class="community-card">
+                    <h3>Share Your Story</h3>
+                    <p>Connect with others who understand your learning journey.</p>
+                    <button class="btn-primary">Join Discussion</button>
+                </div>
+                <div class="community-card">
+                    <h3>Peer Support</h3>
+                    <p>Get help from fellow neurodivergent learners and mentors.</p>
+                    <button class="btn-primary">Find Support</button>
+                </div>
+                <div class="community-card">
+                    <h3>Celebrate Wins</h3>
+                    <p>Share your achievements in a judgment-free space.</p>
+                    <button class="btn-primary">Share Success</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>AllieDigital</h3>
+                <p>Empowering neurodivergent learners through adaptive technology and inclusive design.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Accessibility</h4>
+                <ul>
+                    <li><a href="#" aria-label="Accessibility statement">Accessibility Statement</a></li>
+                    <li><a href="#" aria-label="Keyboard shortcuts">Keyboard Shortcuts</a></li>
+                    <li><a href="#" aria-label="Support resources">Support Resources</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Community</h4>
+                <ul>
+                    <li><a href="#" aria-label="Discussion forum">Forum</a></li>
+                    <li><a href="#" aria-label="Support groups">Support Groups</a></li>
+                    <li><a href="#" aria-label="Contact us">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 AllieDigital. Designed with ❤️ for neurodivergent minds.</p>
+        </div>
+    </footer>
+
+    <!-- Reading Guide for Dyslexia Support -->
+    <div id="reading-guide" class="reading-guide" aria-hidden="true"></div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
