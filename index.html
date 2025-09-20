@@ -82,6 +82,134 @@
 
     <!-- Main Content -->
     <main id="main-content" class="main-content" role="main">
+        <!-- Home Page Section with Big Logo -->
+        <section id="home" class="page-section active">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <div class="big-logo animated">
+                        <svg class="big-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="bigBrainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#00FFB8;stop-opacity:1"></stop>
+                                    <stop offset="33%" style="stop-color:#00D4FF;stop-opacity:1"></stop>
+                                    <stop offset="66%" style="stop-color:#9B88FF;stop-opacity:1"></stop>
+                                    <stop offset="100%" style="stop-color:#E88FFF;stop-opacity:1"></stop>
+                                </linearGradient>
+                                <radialGradient id="centerGradient">
+                                    <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1"></stop>
+                                    <stop offset="100%" style="stop-color:#00D4FF;stop-opacity:0.6"></stop>
+                                </radialGradient>
+                                <filter id="softGlow">
+                                    <feGaussianBlur stdDeviation="3" result="coloredBlur"></feGaussianBlur>
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur"></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            
+                            <g class="puzzle-brain" opacity="0.9">
+                                <!-- Central brain shape -->
+                                <path d="M20 40 Q30 20 45 25 Q60 15 75 30 Q85 25 80 45 Q85 60 70 65 Q55 75 45 70 Q35 80 25 65 Q15 60 20 40 Z" 
+                                      fill="url(#bigBrainGradient)" 
+                                      filter="url(#softGlow)"
+                                      class="brain-main">
+                                    <animateTransform attributeName="transform"
+                                                      type="scale"
+                                                      values="1;1.05;1"
+                                                      dur="4s"
+                                                      repeatCount="indefinite"/>
+                                </path>
+                                
+                                <!-- Brain segments/puzzle pieces -->
+                                <path d="M30 35 Q35 25 45 30 Q40 40 35 45 Q30 40 30 35 Z" 
+                                      fill="url(#centerGradient)" 
+                                      opacity="0.8"
+                                      class="brain-segment-1">
+                                    <animateTransform attributeName="transform"
+                                                      type="translate"
+                                                      values="0,0;2,1;0,0"
+                                                      dur="6s"
+                                                      repeatCount="indefinite"/>
+                                </path>
+                                
+                                <path d="M55 25 Q65 20 70 30 Q65 35 60 40 Q55 35 55 25 Z" 
+                                      fill="url(#centerGradient)" 
+                                      opacity="0.7"
+                                      class="brain-segment-2">
+                                    <animateTransform attributeName="transform"
+                                                      type="translate"
+                                                      values="0,0;-1,2;0,0"
+                                                      dur="5s"
+                                                      repeatCount="indefinite"/>
+                                </path>
+                                
+                                <path d="M40 55 Q50 50 60 55 Q55 65 50 70 Q45 65 40 55 Z" 
+                                      fill="url(#centerGradient)" 
+                                      opacity="0.6"
+                                      class="brain-segment-3">
+                                    <animateTransform attributeName="transform"
+                                                      type="translate"
+                                                      values="0,0;1,-1;0,0"
+                                                      dur="7s"
+                                                      repeatCount="indefinite"/>
+                                </path>
+                                
+                                <!-- Neural connections -->
+                                <g class="neural-connections" opacity="0.4">
+                                    <line x1="35" y1="40" x2="55" y2="35" stroke="#00FFB8" stroke-width="0.5">
+                                        <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite"/>
+                                    </line>
+                                    <line x1="45" y1="30" x2="50" y2="55" stroke="#00D4FF" stroke-width="0.5">
+                                        <animate attributeName="opacity" values="0.3;0.9;0.3" dur="4s" repeatCount="indefinite"/>
+                                    </line>
+                                    <line x1="60" y1="40" x2="45" y2="65" stroke="#9B88FF" stroke-width="0.5">
+                                        <animate attributeName="opacity" values="0.1;0.7;0.1" dur="5s" repeatCount="indefinite"/>
+                                    </line>
+                                </g>
+                                
+                                <!-- Floating particles around brain -->
+                                <g class="floating-particles">
+                                    <circle cx="25" cy="30" r="1" fill="#00FFB8" opacity="0.6">
+                                        <animateTransform attributeName="transform"
+                                                          type="translate"
+                                                          values="0,0;5,-3;0,0"
+                                                          dur="8s"
+                                                          repeatCount="indefinite"/>
+                                        <animate attributeName="opacity" values="0.3;1;0.3" dur="4s" repeatCount="indefinite"/>
+                                    </circle>
+                                    <circle cx="75" cy="25" r="1.5" fill="#E88FFF" opacity="0.7">
+                                        <animateTransform attributeName="transform"
+                                                          type="translate"
+                                                          values="0,0;-4,4;0,0"
+                                                          dur="6s"
+                                                          repeatCount="indefinite"/>
+                                        <animate attributeName="opacity" values="0.4;1;0.4" dur="3s" repeatCount="indefinite"/>
+                                    </circle>
+                                    <circle cx="70" cy="70" r="1" fill="#00D4FF" opacity="0.5">
+                                        <animateTransform attributeName="transform"
+                                                          type="translate"
+                                                          values="0,0;3,-5;0,0"
+                                                          dur="7s"
+                                                          repeatCount="indefinite"/>
+                                        <animate attributeName="opacity" values="0.2;0.8;0.2" dur="5s" repeatCount="indefinite"/>
+                                    </circle>
+                                    <circle cx="25" cy="65" r="1.2" fill="#9B88FF" opacity="0.6">
+                                        <animateTransform attributeName="transform"
+                                                          type="translate"
+                                                          values="0,0;-2,3;0,0"
+                                                          dur="9s"
+                                                          repeatCount="indefinite"/>
+                                        <animate attributeName="opacity" values="0.3;0.9;0.3" dur="6s" repeatCount="indefinite"/>
+                                    </circle>
+                                </g>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Hero Section -->
         <section class="hero" aria-labelledby="hero-title">
             <div class="hero-content">
