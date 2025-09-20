@@ -1,11 +1,13 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/Dialog'
+import { QuizSkeleton, QuizResultSkeleton } from '@/components/ui/QuizSkeleton'
 import { useQuiz } from '@/hooks/useQuiz'
 import { cn, formatPercentage } from '@/utils'
+import type { QuizState } from '@/types'
 
 interface QuizProps {
   isOpen: boolean
@@ -13,6 +15,9 @@ interface QuizProps {
 }
 
 export function Quiz({ isOpen, onClose }: QuizProps) {
+  const [isLoading, setIsLoading] = useState(false)
+  const [quizState, setQuizState] = useState<QuizState>({ status: 'idle' })
+  
   const {
     isActive,
     isComplete,
@@ -34,26 +39,134 @@ export function Quiz({ isOpen, onClose }: QuizProps) {
 
   const handleClose = () => {
     closeQuiz()
+    setQuizState({ status: 'idle' })
     onClose()
   }
 
-  const handleAnswerSelect = (optionId: string) => {
-    answerQuestion(optionId)
+  const handleStartQuiz = async () => {
+    try {
+      setIsLoading(true)
+      setQuizState({ status: 'loading' })
+      
+      // Simulate loading delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 800))
+      
+      startQuiz()
+      setQuizState({ 
+        status: 'active', 
+        currentQuestion: 0, 
+        totalQuestions: 8 
+      })
+    } catch (error) {
+      setQuizState({ 
+        status: 'error', 
+        error: 'Failed to start quiz. Please try again.',
+        canRetry: true
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
+  const handleAnswerSelect = (optionId: string) => {
+    try {
+      answerQuestion(optionId)
+      
+      if (isActive) {
+        setQuizState({ 
+          status: 'active', 
+          currentQuestion: currentQuestion, 
+          totalQuestions: 8 
+        })
+      }
+    } catch (error) {
+      setQuizState({ 
+        status: 'error', 
+        error: 'Failed to save answer. Please try again.',
+        canRetry: true
+      })
+    }
+  }
+
+  const handleComplete = () => {
+    if (result) {
+      setQuizState({ status: 'complete', result })
+    }
+  }
+
+  // Update quiz state based on hook state
+  React.useEffect(() => {
+    if (isComplete && result) {
+      setQuizState({ status: 'complete', result })
+    } else if (isActive) {
+      setQuizState({ 
+        status: 'active', 
+        currentQuestion: currentQuestion, 
+        totalQuestions: 8 
+      })
+    }
+  }, [isActive, isComplete, result, currentQuestion])
+
   if (!isOpen) return null
+
+  // Show loading skeleton while loading
+  if (isLoading || quizState.status === 'loading') {
+    return <QuizSkeleton />
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        {!isActive && !isComplete && (
-          <QuizStart onStart={startQuiz} onClose={handleClose} />
+        {quizState.status === 'idle' && (
+          <QuizStart onStart={handleStartQuiz} onClose={handleClose} />
+        )}
+
+        {quizState.status === 'error' && (
+          <QuizError 
+            error={quizState.error}
+            canRetry={quizState.canRetry}
+            onRetry={() => setQuizState({ status: 'idle' })}
+            onClose={handleClose}
+          />
+        )}
+
+        {quizState.status === 'active' && currentQuestionData && (
+          <QuizQuestion
+            question={currentQuestionData}
+            currentQuestion={quizState.currentQuestion}
+            totalQuestions={quizState.totalQuestions}
+            progress={progress}
+            selectedAnswer={responses[currentQuestionData.id]}
+            onAnswerSelect={handleAnswerSelect}
+            onNext={nextQuestion}
+            onPrevious={previousQuestion}
+            canGoNext={canGoNext}
+            canGoPrevious={canGoPrevious}
+            isLastQuestion={isLastQuestion}
+            onClose={handleClose}
+          />
+        )}
+
+        {quizState.status === 'complete' && quizState.result && (
+          <QuizResults
+            result={quizState.result}
+            onRetake={() => {
+              resetQuiz()
+              setQuizState({ status: 'idle' })
+            }}
+            onClose={handleClose}
+            isLoading={false}
+          />
+        )}
+
+        {!isActive && !isComplete && quizState.status === 'idle' && (
+          <QuizStart onStart={handleStartQuiz} onClose={handleClose} />
         )}
         
         {isActive && currentQuestionData && (
           <QuizQuestion
             question={currentQuestionData}
-            questionNumber={currentQuestion + 1}
+            currentQuestion={currentQuestion + 1}
             totalQuestions={8}
             progress={progress}
             selectedAnswer={responses[currentQuestionData.id]}
@@ -63,11 +176,20 @@ export function Quiz({ isOpen, onClose }: QuizProps) {
             canGoNext={canGoNext}
             canGoPrevious={canGoPrevious}
             isLastQuestion={isLastQuestion}
+            onClose={handleClose}
           />
         )}
         
         {isComplete && result && (
-          <QuizResults result={result} onReset={resetQuiz} onClose={handleClose} />
+          <QuizResults 
+            result={result} 
+            onRetake={() => {
+              resetQuiz()
+              setQuizState({ status: 'idle' })
+            }} 
+            onClose={handleClose}
+            isLoading={false}
+          />
         )}
       </DialogContent>
     </Dialog>
@@ -121,7 +243,7 @@ function QuizStart({ onStart, onClose }: QuizStartProps) {
 
 interface QuizQuestionProps {
   question: any
-  questionNumber: number
+  currentQuestion: number
   totalQuestions: number
   progress: number
   selectedAnswer?: string
@@ -131,11 +253,12 @@ interface QuizQuestionProps {
   canGoNext: boolean
   canGoPrevious: boolean
   isLastQuestion: boolean
+  onClose: () => void
 }
 
 function QuizQuestion({
   question,
-  questionNumber,
+  currentQuestion,
   totalQuestions,
   progress,
   selectedAnswer,
@@ -145,13 +268,14 @@ function QuizQuestion({
   canGoNext,
   canGoPrevious,
   isLastQuestion,
+  onClose,
 }: QuizQuestionProps) {
   return (
     <>
       <DialogHeader>
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm text-slate-500">
-            Question {questionNumber} of {totalQuestions}
+            Question {currentQuestion + 1} of {totalQuestions}
           </span>
           <span className="text-sm text-slate-500">
             {formatPercentage(progress)} complete
@@ -227,13 +351,51 @@ function QuizQuestion({
   )
 }
 
-interface QuizResultsProps {
-  result: any
-  onReset: () => void
+interface QuizErrorProps {
+  error: string
+  canRetry: boolean
+  onRetry: () => void
   onClose: () => void
 }
 
-function QuizResults({ result, onReset, onClose }: QuizResultsProps) {
+function QuizError({ error, canRetry, onRetry, onClose }: QuizErrorProps) {
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle className="text-xl font-bold text-center text-red-600 dark:text-red-400">
+          Quiz Error
+        </DialogTitle>
+        <DialogDescription className="text-center">
+          {error}
+        </DialogDescription>
+      </DialogHeader>
+      
+      <div className="flex gap-3 justify-center pt-4">
+        {canRetry && (
+          <Button onClick={onRetry} variant="default">
+            Try Again
+          </Button>
+        )}
+        <Button onClick={onClose} variant="outline">
+          Close
+        </Button>
+      </div>
+    </>
+  )
+}
+
+interface QuizResultsProps {
+  result: any
+  onRetake: () => void
+  onClose: () => void
+  isLoading: boolean
+}
+
+function QuizResults({ result, onRetake, onClose, isLoading }: QuizResultsProps) {
+  if (isLoading) {
+    return <QuizResultSkeleton />
+  }
+
   const topStyles = result.learningStyles.slice(0, 3)
 
   return (
@@ -280,7 +442,7 @@ function QuizResults({ result, onReset, onClose }: QuizResultsProps) {
         ))}
         
         <div className="flex justify-between pt-4">
-          <Button variant="outline" onClick={onReset}>
+          <Button variant="outline" onClick={onRetake}>
             Retake Quiz
           </Button>
           <Button onClick={onClose}>

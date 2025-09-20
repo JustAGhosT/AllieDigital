@@ -41,6 +41,14 @@ export interface QuizResult {
   responses: Record<string, string>
 }
 
+// Enhanced quiz state with discriminated unions
+export type QuizState = 
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'active'; currentQuestion: number; totalQuestions: number }
+  | { status: 'complete'; result: QuizResult }
+  | { status: 'error'; error: string; canRetry: boolean }
+
 // Accessibility types
 export interface AccessibilitySettings {
   fontSize: number
