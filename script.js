@@ -22,6 +22,11 @@ const CONFIG = {
     SPEECH_ENABLED: false
 };
 
+// Logo animation variables
+let logoFloatY = 0;
+let logoRotation = 0;
+let gradientPosition = 0;
+
 // Global state management
 const AppState = {
     currentTheme: 'light',
@@ -793,6 +798,7 @@ class AllieDigitalApp {
         this.setupEventListeners();
         this.initializeComponents();
         this.setupIntersectionObserver();
+        this.initializeLogoAnimation();
     }
     
     setupEventListeners() {
@@ -833,6 +839,10 @@ class AllieDigitalApp {
             CONFIG.REDUCED_MOTION = e.target.checked;
             document.documentElement.style.setProperty('--transition-fast', 
                 CONFIG.REDUCED_MOTION ? '0s' : '0.15s ease-in-out');
+            
+            // Dispatch event for logo animation
+            document.dispatchEvent(new CustomEvent('motionPreferenceChanged'));
+            
             this.accessibility.saveUserPreferences();
         });
         
@@ -945,6 +955,71 @@ class AllieDigitalApp {
             this.accessibility.speak('Listening for voice command...');
             AppState.speechRecognition.start();
         }
+    }
+    
+    initializeLogoAnimation() {
+        // Initialize logo animation if motion is not reduced
+        if (!CONFIG.REDUCED_MOTION) {
+            this.animateLogo();
+        }
+        
+        // Update logo animation when motion preference changes
+        document.addEventListener('motionPreferenceChanged', () => {
+            if (CONFIG.REDUCED_MOTION) {
+                this.resetLogoAnimation();
+            } else {
+                this.animateLogo();
+            }
+        });
+    }
+    
+    animateLogo() {
+        const logoElement = $('.nav-brand h1');
+        if (!logoElement) return;
+        
+        const animate = () => {
+            if (CONFIG.REDUCED_MOTION) return;
+            
+            // Update animation variables
+            logoFloatY += 0.02;
+            logoRotation += 0.005;
+            gradientPosition += 0.01;
+            
+            // Apply floating animation
+            const floatOffset = Math.sin(logoFloatY) * 3;
+            const rotateOffset = Math.sin(logoRotation) * 2;
+            
+            // Apply transforms
+            logoElement.style.transform = `translateY(${floatOffset}px) rotate(${rotateOffset}deg)`;
+            
+            // Apply gradient animation
+            const gradientAngle = (gradientPosition * 180) % 360;
+            logoElement.style.background = `linear-gradient(${gradientAngle}deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%)`;
+            logoElement.style.webkitBackgroundClip = 'text';
+            logoElement.style.webkitTextFillColor = 'transparent';
+            logoElement.style.backgroundClip = 'text';
+            
+            requestAnimationFrame(animate);
+        };
+        
+        animate();
+    }
+    
+    resetLogoAnimation() {
+        const logoElement = $('.nav-brand h1');
+        if (!logoElement) return;
+        
+        // Reset animation variables
+        logoFloatY = 0;
+        logoRotation = 0;
+        gradientPosition = 0;
+        
+        // Reset styles
+        logoElement.style.transform = '';
+        logoElement.style.background = '';
+        logoElement.style.webkitBackgroundClip = '';
+        logoElement.style.webkitTextFillColor = '';
+        logoElement.style.backgroundClip = '';
     }
 }
 

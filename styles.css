@@ -328,6 +328,10 @@ p {
   font-size: var(--font-size-2xl);
   color: var(--primary-color);
   margin: 0;
+  transition: transform var(--transition-normal), background var(--transition-normal);
+  transform-origin: center;
+  will-change: transform, background;
+  display: inline-block;
 }
 
 .tagline {
