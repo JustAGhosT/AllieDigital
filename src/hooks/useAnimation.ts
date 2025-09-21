@@ -4,18 +4,30 @@ import { prefersReducedMotion } from '@/utils'
 interface AnimationConfig {
   enabled: boolean
   reducedMotion: boolean
+  speed: number
+  slowdown: number
+  wavesVisible: boolean
   logoFloat: number
   logoRotation: number
+  logoScale: number
   gradientPosition: number
+  statusPulse: number
+  time: number
 }
 
 export function useAnimation() {
   const [config, setConfig] = useState<AnimationConfig>({
     enabled: true,
     reducedMotion: false,
+    speed: 1.0,
+    slowdown: 1.0,
+    wavesVisible: true,
     logoFloat: 0,
     logoRotation: 0,
+    logoScale: 1,
     gradientPosition: 0,
+    statusPulse: 1,
+    time: 0,
   })
 
   useEffect(() => {
@@ -44,12 +56,16 @@ export function useAnimation() {
 
     const animate = () => {
       const time = Date.now() / 1000
+      const speedMultiplier = config.speed * config.slowdown
 
       setConfig(prev => ({
         ...prev,
-        logoFloat: Math.sin(time * 0.5) * 3,
-        logoRotation: Math.sin(time * 0.3) * 2,
-        gradientPosition: (time * 10) % 360,
+        time,
+        logoFloat: Math.sin(time * 0.5 * speedMultiplier) * 10,
+        logoRotation: Math.sin(time * 0.2 * speedMultiplier) * 3,
+        logoScale: 1 + Math.sin(time * 0.4 * speedMultiplier) * 0.05,
+        gradientPosition: (time * 20 * speedMultiplier) % 360,
+        statusPulse: 0.3 + Math.abs(Math.sin(time * 2 * speedMultiplier)) * 0.7,
       }))
 
       animationId = requestAnimationFrame(animate)
@@ -58,7 +74,7 @@ export function useAnimation() {
     animationId = requestAnimationFrame(animate)
 
     return () => cancelAnimationFrame(animationId)
-  }, [config.enabled])
+  }, [config.enabled, config.speed, config.slowdown])
 
   const toggleAnimation = useCallback(() => {
     setConfig(prev => ({
@@ -67,18 +83,44 @@ export function useAnimation() {
     }))
   }, [])
 
+  const toggleWaves = useCallback(() => {
+    setConfig(prev => ({
+      ...prev,
+      wavesVisible: !prev.wavesVisible,
+    }))
+  }, [])
+
+  const setAnimationSpeed = useCallback((speed: number) => {
+    setConfig(prev => ({
+      ...prev,
+      speed: Math.max(0.1, Math.min(5.0, speed)), // Clamp between 0.1 and 5.0
+    }))
+  }, [])
+
+  const setSlowdown = useCallback((slowdown: number) => {
+    setConfig(prev => ({
+      ...prev,
+      slowdown: Math.max(0.1, Math.min(2.0, slowdown)), // Clamp between 0.1 and 2.0
+    }))
+  }, [])
+
   const resetAnimation = useCallback(() => {
     setConfig(prev => ({
       ...prev,
       logoFloat: 0,
       logoRotation: 0,
+      logoScale: 1,
       gradientPosition: 0,
+      statusPulse: 1,
     }))
   }, [])
 
   return {
     ...config,
     toggleAnimation,
+    toggleWaves,
+    setAnimationSpeed,
+    setSlowdown,
     resetAnimation,
   }
 }
