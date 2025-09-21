@@ -22,13 +22,6 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 172 85% 50%;
     --radius: 0.5rem;
-    
-    /* Animation speed variables */
-    --pulse-duration: 4s;
-    --animation-speed: 1;
-    --float-amplitude: 10px;
-    --rotation-amplitude: 3deg;
-    --scale-amplitude: 0.05;
   }
 
   .dark {
@@ -143,12 +136,6 @@
     }
   }
 
-  /* Override reduced motion when explicitly disabled */
-  .motion-reduce * {
-    animation-play-state: paused !important;
-    transition-duration: 0.01ms !important;
-  }
-
   /* High contrast mode adjustments */
   @media (prefers-contrast: high) {
     .high-contrast-auto {
@@ -229,78 +216,6 @@
 
   .status-away {
     @apply w-3 h-3 bg-yellow-500 rounded-full;
-  }
-
-  /* Enhanced animation classes */
-  .animated {
-    transition: all var(--pulse-duration) ease-in-out;
-  }
-
-  .condition-tag {
-    transition: transform 0.2s ease-in-out;
-    will-change: transform;
-  }
-
-  .feature-card {
-    transition: box-shadow 0.3s ease-in-out;
-    will-change: box-shadow;
-  }
-
-  .learning-nodes circle {
-    transition: transform 0.1s ease-in-out;
-    will-change: transform;
-    transform-origin: center;
-  }
-
-  .status-indicator {
-    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
-    will-change: opacity, transform;
-  }
-
-  /* Button gradient animations */
-  .btn-primary, .modal-button {
-    background-size: 200% 200%;
-    transition: background-position 0.3s ease;
-    will-change: background-image;
-  }
-
-  /* Enhanced pulse animation with variable duration */
-  .animate-pulse-soft {
-    animation: pulse-enhanced var(--pulse-duration) ease-in-out infinite;
-  }
-
-  /* Enhanced float animation */
-  .animate-float {
-    animation: float-enhanced var(--pulse-duration) ease-in-out infinite;
-  }
-
-  /* Gradient background animation */
-  .animate-gradient-shift {
-    background-size: 200% 200%;
-    animation: gradientShift calc(var(--pulse-duration) * 2) ease infinite;
-  }
-
-  /* Custom slider styles */
-  .slider {
-    @apply appearance-none bg-slate-200 dark:bg-slate-700 rounded-lg cursor-pointer;
-  }
-
-  .slider::-webkit-slider-thumb {
-    @apply appearance-none w-5 h-5 bg-primary-500 rounded-full cursor-pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  .slider::-moz-range-thumb {
-    @apply w-5 h-5 bg-primary-500 rounded-full cursor-pointer border-0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  .slider:disabled::-webkit-slider-thumb {
-    @apply bg-slate-400 cursor-not-allowed;
-  }
-
-  .slider:disabled::-moz-range-thumb {
-    @apply bg-slate-400 cursor-not-allowed;
   }
 }
 
@@ -408,42 +323,6 @@
   }
   50% {
     background-position: 100% 50%;
-  }
-}
-
-/* Enhanced Animation System Keyframes */
-@keyframes pulse-enhanced {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(0.98);
-  }
-}
-
-@keyframes float-enhanced {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(calc(var(--float-amplitude) * -1));
-  }
-}
-
-@keyframes gradientShift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  25% {
-    background-position: 100% 0%;
-  }
-  50% {
-    background-position: 100% 100%;
-  }
-  75% {
-    background-position: 0% 100%;
   }
 }
 

@@ -13,19 +13,62 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ onQuizStart }: HeroSectionProps) {
-  const { enabled: animationsEnabled, logoFloat, logoRotation, logoScale, statusPulse } = useEnhancedAnimations()
+  const { enabled: animationsEnabled, logoFloat, logoRotation, logoScale, statusPulse, wavesVisible } = useEnhancedAnimations()
 
   return (
     <section 
       id="hero" 
       className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 overflow-hidden"
     >
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-200/30 rounded-full blur-3xl animate-pulse-soft" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary-200/30 rounded-full blur-3xl animate-pulse-soft" />
-        <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-accent-200/30 rounded-full blur-3xl animate-pulse-soft" />
-      </div>
+      {/* Animated Wave Background Elements */}
+      {animationsEnabled && wavesVisible && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div 
+            className="absolute top-20 left-10 w-72 h-72 bg-primary-200/30 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.6, 0.3],
+              x: [0, 10, -5, 0],
+              y: [0, -15, 10, 0],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+          <motion.div 
+            className="absolute bottom-20 right-10 w-96 h-96 bg-secondary-200/30 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 0.8, 1.1, 1],
+              opacity: [0.4, 0.7, 0.2, 0.4],
+              x: [0, -20, 15, 0],
+              y: [0, 10, -25, 0],
+            }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2,
+            }}
+          />
+          <motion.div 
+            className="absolute top-1/2 left-1/2 w-80 h-80 bg-accent-200/30 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.3, 0.9, 1],
+              opacity: [0.2, 0.5, 0.8, 0.2],
+              x: [0, 25, -10, 0],
+              y: [0, -20, 30, 0],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 4,
+            }}
+          />
+        </div>
+      )}
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
