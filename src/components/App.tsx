@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer'
 import { HeroSection } from '@/components/features/HeroSection'
 import { Quiz } from '@/components/features/Quiz'
 import { AccessibilityPanel } from '@/components/features/AccessibilityPanel'
+import { AnimationControls } from '@/components/features/AnimationControls'
 import { useAccessibility } from '@/hooks/useAccessibility'
 import { useTheme } from '@/hooks/useTheme'
 import { cn } from '@/utils'
@@ -14,6 +15,7 @@ export default function App() {
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false)
   const [isQuizOpen, setIsQuizOpen] = useState(false)
   const [speechEnabled, setSpeechEnabled] = useState(false)
+  const [showAnimationControls, setShowAnimationControls] = useState(false)
   const { settings } = useAccessibility()
   const { theme } = useTheme()
 
@@ -101,11 +103,17 @@ export default function App() {
         event.preventDefault()
         setIsAccessibilityOpen(!isAccessibilityOpen)
       }
+      
+      // Alt + C for animation controls
+      if (event.altKey && event.key === 'c') {
+        event.preventDefault()
+        setShowAnimationControls(!showAnimationControls)
+      }
     }
 
     document.addEventListener('keydown', handleKeydown)
     return () => document.removeEventListener('keydown', handleKeydown)
-  }, [isAccessibilityOpen, speechEnabled])
+  }, [isAccessibilityOpen, speechEnabled, showAnimationControls])
 
   return (
     <div 
@@ -171,7 +179,7 @@ export default function App() {
               ].map((feature, index) => (
                 <div 
                   key={index}
-                  className="card card-hover p-6 text-center"
+                  className="feature-card card card-hover p-6 text-center"
                 >
                   <div className="text-4xl mb-4">{feature.icon}</div>
                   <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
@@ -260,6 +268,32 @@ export default function App() {
         isOpen={isQuizOpen}
         onClose={() => setIsQuizOpen(false)}
       />
+
+      {/* Animation Controls - Floating Panel */}
+      {showAnimationControls && (
+        <div className="fixed bottom-4 right-4 z-40 max-w-sm">
+          <AnimationControls />
+          <button
+            onClick={() => setShowAnimationControls(false)}
+            className="absolute -top-2 -right-2 w-6 h-6 bg-slate-600 text-white rounded-full flex items-center justify-center text-sm hover:bg-slate-700 transition-colors"
+            aria-label="Close animation controls"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* Animation Controls Toggle Button */}
+      {!showAnimationControls && (
+        <button
+          onClick={() => setShowAnimationControls(true)}
+          className="fixed bottom-4 right-4 z-40 w-12 h-12 bg-primary-600 hover:bg-primary-700 text-white rounded-full flex items-center justify-center shadow-lg transition-colors"
+          title="Show Animation Controls (Alt+C)"
+          aria-label="Show animation controls"
+        >
+          🎭
+        </button>
+      )}
 
       {/* Screen reader announcements */}
       <div
